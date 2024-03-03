@@ -3,8 +3,19 @@ import Link from 'next/link'
 import React from 'react'
 import { BsChevronDown } from "react-icons/bs"
 import { AiOutlineShoppingCart } from "react-icons/ai"
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, getCart } from '@/store/cartSlice'
+import { RootState } from '@/store'
 
 
+interface Cart {
+  cart : {
+    id : string;
+    name : string;
+    price : number;
+    quantity : number;
+  }
+}
 interface Menu {
   id : number;
   name : string;
@@ -12,6 +23,9 @@ interface Menu {
 
 
 const SubMenu = () => {
+  const dispatch = useDispatch()
+  const cart = useSelector((state : RootState)=>state.cart.cart)
+  console.log(cart)
   const menuItems : Menu[] = [
     { id : 1, name : "Home" },
     { id : 2, name : "Saved" },
@@ -25,6 +39,9 @@ const SubMenu = () => {
     { id : 10, name : "Home & Garden" },
     { id : 11 , name : "Sell" },
   ]
+  React.useEffect(()=>{
+    dispatch(getCart())
+  }, [dispatch])
   return (
     <div className='border-b'>
        <div className="flex items-center justify-between w-full mx-auto max-w-[1200px]">
@@ -36,6 +53,15 @@ const SubMenu = () => {
               </li>
             ))
           }
+          <button 
+          onClick={()=>dispatch(addToCart({
+            id : 1,
+            name : "your balls",
+            price : 25,
+            quantity : 250
+          }))}
+          className=''>Apply</button>
+
         </ul>
        </div>
     </div>

@@ -1,11 +1,17 @@
+"use client"
+
 import SimilarProducts from '@/app/(components)/similarproducts'
 import MainLayout from '@/app/(layouts)/mainlayout'
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store'
 
 
 // int
 const ProductPage = ({ params } : { params : { id : string } }) => {
-  
+  const dispatch = useDispatch()
+  const isCartAdded = useSelector<RootState>(state=>state.cart.isItemAdded)
+  console.log(isCartAdded)
   const product = {
     id : 1,
     title : "Brown Leather Bag",
