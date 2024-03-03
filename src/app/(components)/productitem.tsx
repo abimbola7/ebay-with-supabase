@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React from 'react'
 
-type ProductProps = {
+export type ProductProps = {
   id : number;
   title : string;
   description : string;

@@ -1,3 +1,4 @@
+import SimilarProducts from '@/app/(components)/similarproducts'
 import MainLayout from '@/app/(layouts)/mainlayout'
 import React from 'react'
 
@@ -50,6 +51,7 @@ const ProductPage = ({ params } : { params : { id : string } }) => {
           </div>
         </div>
       </div>
+      <SimilarProducts />
     </MainLayout>
   )
 }

@@ -5,7 +5,7 @@ import SubMenu from './includes/submenu'
 import Footer from './includes/footer'
 
 
-interface LayoutProps {
+export interface LayoutProps {
   children : React.ReactNode
 }
 

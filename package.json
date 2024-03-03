@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",
@@ -37,6 +37,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
+    "supabase": "^1.145.4",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

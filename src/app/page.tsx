@@ -1,9 +1,13 @@
+"use client"
+import React from "react";
 import Image from "next/image";
 import MainLayout from "./(layouts)/mainlayout";
 import MyCarousel from "./(components)/carousel";
 import ProductItem from "./(components)/productitem";
+import useSupabase from "./(hooks)/useSupabase";
+import { BsChevronDown } from "react-icons/bs";
 
-interface Products {
+export interface Products {
   id : number;
   title : string;
   description : string;
@@ -13,6 +17,10 @@ interface Products {
 
 
 export default function Home() {
+  const  { 
+    user,id,name,picture,email,setSession,signOut
+   } = useSupabase();
+
   const products : Products[] = [
     {
       id : 1,
@@ -29,6 +37,7 @@ export default function Home() {
       price : 1999
     },
   ]
+
   return (
     <MainLayout>
       <MyCarousel />
