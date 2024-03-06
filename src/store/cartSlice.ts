@@ -4,16 +4,24 @@ import { useRouter } from "next/navigation";
 
 export interface CartInt {
   id : number,
-  name : string,
+  title : String,
+  description : String,
   price : number,
-  quantity : number,
+  url : String,
 }
 
-const initialCartState = {
-  cart : [] as CartInt[],
-  total : 0 as number,
-  quantity : 0 as number,
-  isItemAdded : false as boolean
+interface CartState {
+  cart : CartInt[],
+  total : number,
+  quantity : number,
+  isItemAdded : boolean
+}
+
+const initialCartState : CartState = {
+  cart : [],
+  total : 0,
+  quantity : 0,
+  isItemAdded : false,
 }
 
 export const cartSlice = createSlice({
@@ -42,6 +50,7 @@ export const cartSlice = createSlice({
         }
       }
       state.cart.push(action.payload);
+      state.total = state.cart.length
       localStorage.setItem("carts", JSON.stringify(state.cart))
     },
     removeFromCart(state, action : PayloadAction<CartInt>) {
@@ -55,6 +64,7 @@ export const cartSlice = createSlice({
         }
       }
       state.cart = state.cart.filter((item)=>item.id !== action.payload.id);
+      state.total = state.cart.length
       localStorage.setItem("carts", JSON.stringify(state.cart))
     },
     cartCount(state){
@@ -98,7 +108,7 @@ export const cartSlice = createSlice({
           state.cart = []
         }
       }
-      const item = state.cart.filter((item)=>item.id === action.payload.id);
+      const item = state.cart.find((item)=>item.id === action.payload.id);
       if (item) {
         state.isItemAdded = true;
         return
@@ -110,5 +120,5 @@ export const cartSlice = createSlice({
 })
 
 
-export const { getCart, addToCart, cartCount, cartQuantity, clearCart, removeFromCart } = cartSlice.actions
+export const { getCart, addToCart, cartQuantity, clearCart, removeFromCart, isItemAddedToCart } = cartSlice.actions
 export default cartSlice.reducer

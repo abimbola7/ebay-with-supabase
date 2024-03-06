@@ -38,6 +38,30 @@ export default function Home() {
     },
   ]
 
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`/api/products`)
+      if (!res.ok) {
+        throw Error("Something went wrong")
+      }
+      const products = await res.json()
+      console.log(products)
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+  const fetchAddress = async () => {
+    const res = await fetch(`/api/address/1234`)
+    const data = await res.json()
+    console.log(data)
+  }
+
+  React.useEffect(()=>{
+    // fetchAddress()
+    fetchProducts();
+  },[])
+
   return (
     <MainLayout>
       <MyCarousel />

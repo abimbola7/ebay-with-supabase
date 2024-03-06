@@ -5,6 +5,8 @@ import MainLayout from '@/app/(layouts)/mainlayout'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import { addToCart, isItemAddedToCart, removeFromCart } from '@/store/cartSlice'
+import { toast } from 'react-toastify'
 
 
 // int
@@ -20,6 +22,9 @@ const ProductPage = ({ params } : { params : { id : string } }) => {
     price : 2500
   }
 
+  React.useEffect(()=>{
+    dispatch(isItemAddedToCart(product))
+  },[dispatch])
   return (
     <MainLayout>
       <div className='flex px-4 py-10'>
@@ -45,7 +50,28 @@ const ProductPage = ({ params } : { params : { id : string } }) => {
                 <div className="flex items-center">
                   <div className="font-bold text-[20px] ml-2">${(product.price / 100).toFixed(2)}</div>
                 </div>
-                <button className='bg-blue-400 text-white py-2 px-3 rounded-md'>Add to Cart</button>
+                <button 
+                onClick={
+                  () => {
+                    if (isCartAdded) {
+                      dispatch(removeFromCart(product))
+                      toast.info("Removed from cart", { 
+                        autoClose : 3000
+                       })
+                    } else {
+                      dispatch(addToCart(product));
+                      toast.success("Added to cart", {
+                        autoClose : 3000
+                      })
+                    }
+                    dispatch(isItemAddedToCart(product))
+                  }
+                }
+                className={`${ isCartAdded ? 'bg-yellow-400 hover:bg-yellow-600' : 'bg-blue-400 hover:bg-blue-600' } text-white py-2 px-3 rounded-md`}>
+                  {
+                    isCartAdded ? 'Remove From Cart' : 'Add to Cart'
+                  }
+                </button>
               </div>
             </div>
             <div className="border-b py-1">

@@ -4,15 +4,19 @@ import React from 'react'
 import { BsChevronDown } from "react-icons/bs"
 import { AiOutlineShoppingCart } from "react-icons/ai"
 import useSupabase from '@/app/(hooks)/useSupabase'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 
 const TopMenu = () => {
+  const totals = useSelector((state:RootState)=>state.cart.total)
+  // console.log(totals)
   const [ isMenu, setIsMenu ] = React.useState(false);
   const  { 
     user,id,name,picture,email,setSession,signOut
    } = useSupabase();
 
   const isLoggedIn = () => {
-    console.log(user, user?.id)
+    // console.log(user, user?.id)
     if (user && user.id) {
       return (
         <button 
@@ -81,11 +85,15 @@ const TopMenu = () => {
           <li className='px-3 hover:underline cursor-pointer'>
             <div className="relative">
               <AiOutlineShoppingCart size={22}/>
-              <div className='absolute text-[10px] -top-[2px] -right-[5px] bg-red-500 w-[14px] h-[14px] rounded-full text-white text-center flex justify-center items-center'>
-                <div className='flex items-center justify-center -mt-[1px]'>
-                  3
-                </div>
-              </div>
+              {
+                totals > 0 && (
+                  <div className='absolute text-[10px] -top-[2px] -right-[5px] bg-red-500 w-[14px] h-[14px] rounded-full text-white text-center flex justify-center items-center'>
+                    <div className='flex items-center justify-center -mt-[1px]'>
+                      { totals }
+                    </div>
+                  </div>
+                )
+              }
             </div>
           </li>
         </ul>
