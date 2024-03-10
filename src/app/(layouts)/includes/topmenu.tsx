@@ -4,12 +4,13 @@ import React from 'react'
 import { BsChevronDown } from "react-icons/bs"
 import { AiOutlineShoppingCart } from "react-icons/ai"
 import useSupabase from '@/app/(hooks)/useSupabase'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/store'
+import { cartCount } from '@/store/cartSlice'
 
 const TopMenu = () => {
   const totals = useSelector((state:RootState)=>state.cart.total)
-  // console.log(totals)
+  const dispatch = useDispatch()
   const [ isMenu, setIsMenu ] = React.useState(false);
   const  { 
     user,id,name,picture,email,setSession,signOut
@@ -39,6 +40,11 @@ const TopMenu = () => {
       </Link>
     )
   }
+
+  React.useEffect(()=>{
+    dispatch(cartCount())
+  }, [])
+
   return (
     <div className='border-b'>
        <div className="flex items-center justify-between w-full mx-auto max-w-[1200px]">

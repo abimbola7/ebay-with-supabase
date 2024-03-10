@@ -16,7 +16,7 @@ export async function GET(req:NextRequest, params : { name : string }) {
       }
     })
     await prisma.$disconnect();
-    return NextResponse.json({ products }, { status : 200 })
+    return NextResponse.json(products);
   } catch(error) {
     console.log(error)
     await prisma.$disconnect();

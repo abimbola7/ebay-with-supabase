@@ -11,6 +11,7 @@ const useCreateAddress = () => {
   const createAddress = async (details : Address) => {
     let url = 'create';
     if (details.addressId) url = "update"
+    console.log(url)
 
     const response = await fetch(`api/address/${url}`, {
       method : 'POST',

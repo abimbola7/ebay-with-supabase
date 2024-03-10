@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { Database } from "@/app/database.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 
-export async function PUT(req:NextRequest) {
+export async function POST(req:NextRequest) {
   const cookieStore = cookies()
   const body = await req.json()
   const supabase = createServerComponentClient<Database>({
@@ -26,7 +26,9 @@ export async function PUT(req:NextRequest) {
         zipcode : body.zipcode,
       }
     })
+    return NextResponse.json(res)
   }catch(error) {
     console.log(error)
+    return NextResponse.json("Something went wrong", { status : 500 })
   }
 }

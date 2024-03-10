@@ -4,7 +4,7 @@ import Image from "next/image";
 import MainLayout from "./(layouts)/mainlayout";
 import MyCarousel from "./(components)/carousel";
 import ProductItem from "./(components)/productitem";
-import useSupabase from "./(hooks)/useSupabase";
+import useIsLoading from "./(hooks)/useIsLoading";
 import { BsChevronDown } from "react-icons/bs";
 
 export interface Products {
@@ -17,37 +17,22 @@ export interface Products {
 
 
 export default function Home() {
-  const  { 
-    user,id,name,picture,email,setSession,signOut
-   } = useSupabase();
-
-  const products : Products[] = [
-    {
-      id : 1,
-      title : "Brown Leather Bag",
-      description : "Lorem ipusm motherfucker",
-      url : "https://picsum.photos/id/7",
-      price : 2500
-    },
-    {
-      id : 2,
-      title : "School Books",
-      description : "Lorem ipusm motherfucker",
-      url : "https://picsum.photos/id/20",
-      price : 1999
-    },
-  ]
+  const { eDonLoad } = useIsLoading()
+  const [ products, setProducts ] = React.useState<Products[]>([]);
 
   const fetchProducts = async () => {
+    eDonLoad(true);
     try {
       const res = await fetch(`/api/products`)
       if (!res.ok) {
         throw Error("Something went wrong")
       }
-      const products = await res.json()
-      console.log(products)
+      const results = await res.json()
+      setProducts(results)
+      eDonLoad(false);
     }catch(error){
       console.log(error)
+      eDonLoad(false);
     }
   }
 

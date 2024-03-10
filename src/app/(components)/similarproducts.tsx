@@ -1,28 +1,38 @@
+"use client"
+
 import React from 'react'
 import { Products } from '../page'
 import ProductItem from './productitem'
 import { BiLoader } from 'react-icons/bi'
+import useIsLoading from '../(hooks)/useIsLoading'
 
 
 
 
 const SimilarProducts = () => {
-  const products : Products[] = [
-    {
-      id : 1,
-      title : "Brown Leather Bag",
-      description : "Lorem ipusm motherfucker",
-      url : "https://picsum.photos/id/7",
-      price : 2500
-    },
-    {
-      id : 2,
-      title : "School Books",
-      description : "Lorem ipusm motherfucker",
-      url : "https://picsum.photos/id/20",
-      price : 1999
-    },
-  ]
+  const { eDonLoad } = useIsLoading()
+  const [ products, setProducts ] = React.useState<Products[]>([]);
+
+  const fetchProducts = async () => {
+    // eDonLoad(true);
+    try {
+      const res = await fetch(`/api/products/get-random`)
+      if (!res.ok) {
+        throw Error("Something went wrong")
+      }
+      const results = await res.json();
+      console.log(results)
+      setProducts(results)
+      // eDonLoad(false);
+    }catch(error){
+      console.log(error)
+      // eDonLoad(false);
+    }
+  }
+
+  React.useEffect(()=>{
+    fetchProducts();
+  },[])
   return (
     <div>
       <div className="border-b py-1 max-w-[1200px] mx-auto"/>

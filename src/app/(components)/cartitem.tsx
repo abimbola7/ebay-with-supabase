@@ -1,4 +1,7 @@
 import React from 'react'
+import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeFromCart, getCart, cartQuantity } from '@/store/cartSlice';
 
 interface Product {
   title : string;
@@ -11,6 +14,22 @@ interface Product {
 
 
 const CartItem = ({ product } : {product : Product}) => {
+  const dispatch = useDispatch()
+  const { id } = product
+  const removeItemFromCart = () => {
+    let res = confirm(`Are you sure you want to remove this? "${product.title}"`)
+    if (res) {
+      dispatch(removeFromCart(product));
+      toast.info(
+        "Removed from cart",{
+          autoClose : 3000
+        }
+      )
+    }
+    dispatch(getCart())
+    dispatch(cartQuantity())
+  }
+  console.log("productss")
   return (
     <div className="relative flex justify-start my-2 border w-full p-6">
       <img src={`${product.url}/150`} alt="" className="rounded-md w-[150px] h-[150px]" />
@@ -31,7 +50,9 @@ const CartItem = ({ product } : {product : Product}) => {
           { product?.description.substring(0, 150) }...
         </div>
         <div className="absolute right-0 bottom 0 p-4 text-sm">
-          <button className='underline text-blue-500'>
+          <button 
+          onClick={removeItemFromCart}
+          className='underline text-blue-500'>
             Remove
           </button>
         </div>

@@ -2,21 +2,13 @@
 
 import Link from 'next/link';
 import React from 'react'
-
-export type ProductProps = {
-  id : number;
-  title : string;
-  description : string;
-  url : string;
-  price : number;
-
-}
+import { Products } from '../page';
 
 
 
 
-const ProductItem = ({ id, title, description, url, price } : ProductProps ) => {
-  console.log(id, title, description, price, url)
+const ProductItem = ({ id, title, description, url, price } : Products ) => {
+  // console.log(id, title, description, price, url)
   return (
     <Link 
     href={`/product/${id}`}

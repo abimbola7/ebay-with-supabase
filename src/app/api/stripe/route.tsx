@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { Database } from "@/app/database.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 
-export async function PUT(req:NextRequest) {
+export async function POST(req:NextRequest) {
   const cookieStore = cookies()
   const body = await req.json()
   const supabase = createServerComponentClient<Database>({

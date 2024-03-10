@@ -7,24 +7,38 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { addToCart, isItemAddedToCart, removeFromCart } from '@/store/cartSlice'
 import { toast } from 'react-toastify'
+import { CartInt } from '@/store/cartSlice'
+import useIsLoading from '@/app/(hooks)/useIsLoading'
 
 
-// int
 const ProductPage = ({ params } : { params : { id : string } }) => {
+  const { eDonLoad } = useIsLoading()
   const dispatch = useDispatch()
   const isCartAdded = useSelector<RootState>(state=>state.cart.isItemAdded)
-  console.log(isCartAdded)
-  const product = {
-    id : 1,
-    title : "Brown Leather Bag",
-    description : "Lorem ipusm motherfucker",
-    url : "https://picsum.photos/id/7",
-    price : 2500
+  const [ product, setProduct ] = React.useState<CartInt>({})
+  console.log()
+
+  const getProduct = async () => {
+    eDonLoad(true);
+    try {
+      const res = await fetch(`/api/product/${params.id}`)
+      const result = await res.json()
+      setProduct(result)
+      dispatch(isItemAddedToCart(result))
+      eDonLoad(false)
+    }catch(error) {
+      toast.error("Something went wrong", {
+        autoClose : 3000
+      })
+      eDonLoad(false)
+    }
   }
 
   React.useEffect(()=>{
-    dispatch(isItemAddedToCart(product))
+    getProduct()
   },[dispatch])
+
+
   return (
     <MainLayout>
       <div className='flex px-4 py-10'>
@@ -48,7 +62,7 @@ const ProductPage = ({ params } : { params : { id : string } }) => {
             <div className="pt-3 ">
               <div className="w-full flex items-center  justify-between">
                 <div className="flex items-center">
-                  <div className="font-bold text-[20px] ml-2">${(product.price / 100).toFixed(2)}</div>
+                  <div className="font-bold text-[20px] ml-2">${(product.price ? product.price / 100 : 0 ).toFixed(2)}</div>
                 </div>
                 <button 
                 onClick={

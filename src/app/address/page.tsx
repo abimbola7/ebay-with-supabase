@@ -9,6 +9,7 @@ import useUserAddress from '../(hooks)/useUserAddress'
 import useCreateAddress from '../(hooks)/useCreateAddress'
 import { toast } from 'react-toastify'
 import ClientOnly from '../(components)/clientonly'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 
 const AddressPage = () => {
   const router = useRouter();
@@ -99,9 +100,7 @@ const AddressPage = () => {
         name,
         zipcode
       })
-      if (!res.ok) {
-        throw Error("Something went wrong")
-      }
+      console.log(res)
       setCurrentAddress(res);
       setIsUpdatingAddress(false);
       toast.success("Address updated", {
@@ -187,7 +186,14 @@ const AddressPage = () => {
             type='submit'
             disabled={isUpdatingAddress}
             className={`mt-6 w-full text-white text-lg font-semibold p-3 rounded bg-blue-600 disabled:bg-blue-300`}>
-              Update Address
+              {
+                !isUpdatingAddress ? 
+                <div className=''>Update Address</div>:
+                <div className='flex items-center jutsify-center gap-2'>
+                  <AiOutlineLoading3Quarters className='animate-spin'/>
+                  Please wait...
+                </div>
+              }
             </button>
           </form>
         </div>

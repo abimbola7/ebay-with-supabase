@@ -14,6 +14,7 @@ export async function GET(req:NextRequest) {
   })
 
   try {
+    console.log("working??")
     const { data :{
       user
     }, error } = await supabase.auth.getUser()
@@ -32,10 +33,10 @@ export async function GET(req:NextRequest) {
       }
     })
     await prisma.$disconnect()
-    NextResponse.json({ orders },  { status : 200 })
+    return NextResponse.json(orders)
   } catch(error) {
     console.log(error)
     await prisma.$disconnect()
-    NextResponse.json({ error },  { status : 500 })
+    return NextResponse.json({ error },  { status : 500 })
   }
 }

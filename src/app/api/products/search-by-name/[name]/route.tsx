@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import prisma from "@/app/libs/prisma";
 
 
-export async function GET(req:NextRequest, params : { name : string }) { 
+export async function GET(req:NextRequest, { params }  : { params : {name : string} }) { 
   // const user_id = params.user_id
   const { name } = params
   try {
@@ -17,7 +17,7 @@ export async function GET(req:NextRequest, params : { name : string }) {
       }
     })
     await prisma.$disconnect();
-    return NextResponse.json({ items }, { status : 200 })
+    return NextResponse.json(items)
   } catch(error) {
     console.log(error)
     await prisma.$disconnect();

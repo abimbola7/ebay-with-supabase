@@ -16,7 +16,7 @@ export async function POST(req:NextRequest) {
       user
     }, error } = await supabase.auth.getUser()
     if (!user) Error
-    const userId : string = user?.id || ""
+    const userId : string = user?.id || "" 
     const res = await prisma.address.create({
       data : {
         user_id : userId,
@@ -27,6 +27,7 @@ export async function POST(req:NextRequest) {
         zipcode : body.zipcode,
       }
     })
+    return NextResponse.json(res)
   }catch(error) {
     console.log(error);
     return NextResponse.json({ message : error }, { status : 500 })

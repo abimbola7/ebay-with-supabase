@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 
 
 export interface CartInt {
-  id : number,
-  title : String,
-  description : String,
-  price : number,
-  url : String,
+  id? : number,
+  title? : string,
+  description? : string,
+  price? : number,
+  url? : string,
 }
 
 interface CartState {
@@ -29,7 +29,6 @@ export const cartSlice = createSlice({
   initialState : initialCartState,
   reducers : {
     getCart(state) {
-      state.cart = []
       if (typeof localStorage !== "undefined") {
         const storedCart = localStorage.getItem("carts")
         if (storedCart !== null) {
@@ -38,6 +37,10 @@ export const cartSlice = createSlice({
           state.cart = []
         }
       }
+      // for (let i = 0; i < state.cart.length; i++) {
+      //   const element = state.cart[i];
+      //   state.quantity += element.price
+      // }
     },
     addToCart(state, action : PayloadAction<CartInt>) {
       state.cart = []
@@ -52,6 +55,10 @@ export const cartSlice = createSlice({
       state.cart.push(action.payload);
       state.total = state.cart.length
       localStorage.setItem("carts", JSON.stringify(state.cart))
+      // for (let i = 0; i < state.cart.length; i++) {
+      //   const element = state.cart[i];
+      //   state.quantity += element.price
+      // }
     },
     removeFromCart(state, action : PayloadAction<CartInt>) {
       state.cart = []
@@ -68,7 +75,6 @@ export const cartSlice = createSlice({
       localStorage.setItem("carts", JSON.stringify(state.cart))
     },
     cartCount(state){
-      state.cart = []
       if (typeof localStorage !== "undefined") {
         const storedCart = localStorage.getItem("carts")
         if (storedCart !== null) {
@@ -80,8 +86,6 @@ export const cartSlice = createSlice({
       state.total = state.cart.length
     },
     cartQuantity(state){
-      state.cart = []
-      state.quantity= 0
       if (typeof localStorage !== "undefined") {
         const storedCart = localStorage.getItem("carts")
         if (storedCart !== null) {
@@ -92,7 +96,7 @@ export const cartSlice = createSlice({
       }
       for (let i = 0; i < state.cart.length; i++) {
         const element = state.cart[i];
-        state.quantity += element.price
+        state.quantity += element.price ? element.price : 0
       }
     },
     clearCart(state){
@@ -120,5 +124,5 @@ export const cartSlice = createSlice({
 })
 
 
-export const { getCart, addToCart, cartQuantity, clearCart, removeFromCart, isItemAddedToCart } = cartSlice.actions
+export const { getCart, addToCart, cartQuantity, clearCart, removeFromCart, isItemAddedToCart, cartCount } = cartSlice.actions
 export default cartSlice.reducer
