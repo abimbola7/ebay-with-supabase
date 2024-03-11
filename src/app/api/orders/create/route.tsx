@@ -47,10 +47,10 @@ export async function POST(req:NextRequest) {
       })
     })
     await prisma.$disconnect()
-    NextResponse.json("Order Complete", { status : 200 })
+    return NextResponse.json("Order Complete", { status : 200 })
   } catch(error) {
     await prisma.$disconnect()
     console.log(error)
-    NextResponse.json({ error }, { status : 500 })
+    return NextResponse.json({ error }, { status : 500 })
   }
 }

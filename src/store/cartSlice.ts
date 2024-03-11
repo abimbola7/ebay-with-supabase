@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useRouter } from "next/navigation";
+ 
 
 
 export interface CartInt {
@@ -86,6 +87,7 @@ export const cartSlice = createSlice({
       state.total = state.cart.length
     },
     cartQuantity(state){
+      state.quantity = 0
       if (typeof localStorage !== "undefined") {
         const storedCart = localStorage.getItem("carts")
         if (storedCart !== null) {
@@ -95,8 +97,12 @@ export const cartSlice = createSlice({
         }
       }
       for (let i = 0; i < state.cart.length; i++) {
-        const element = state.cart[i];
-        state.quantity += element.price ? element.price : 0
+        console.log(state.cart.length)
+        let element = state.cart[i];
+        if (element?.price) {
+          state.quantity += element.price
+          console.log(state.quantity)
+        }
       }
     },
     clearCart(state){

@@ -40,7 +40,7 @@ const AddressPage = () => {
       eDonLoad(false)
       return;
     }
-    const response = await userAddress();
+    const response = await userAddress(user.id);
     console.log(response)
     if (response) {
       setCurrentAddress(response)

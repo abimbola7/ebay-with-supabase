@@ -1,8 +1,8 @@
 "use client"
 
-import React from 'react'
+import React, { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCart, CartInt, cartCount } from '@/store/cartSlice'
+import { getCart, CartInt, cartCount, clearCart, cartQuantity } from '@/store/cartSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import MainLayout from '../(layouts)/mainlayout'
 import CheckoutItem from "../(components)/checkoutitem"
@@ -12,13 +12,28 @@ import { toast } from 'react-toastify'
 import debounce from 'debounce'
 import { loadStripe, Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js'
 import useIsLoading from '../(hooks)/useIsLoading'
+// import { Address } from '@prisma/client'
+import Link from 'next/link'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
+import useUserAddress from '../(hooks)/useUserAddress'
+
+
+interface Address {
+  name? : string;
+  address? : string;
+  city? : string;
+  country? : string;
+  zipcode? : number;
+}
 
 const CheckoutPage = () => {
+  const { userAddress } = useUserAddress()
   const { eDonLoad } = useIsLoading()
   const router = useRouter()
   const { user } = useSupabase()
   const dispatch = useDispatch()
   const cart = useSelector((state:RootState)=>state.cart.cart);
+  const quantity = useSelector((state:RootState)=>state.cart.quantity)
   console.log(cart)
   const total = useSelector((state:RootState)=>state.cart.total);
   const [ tots, setTots ] = React.useState(total)
@@ -28,8 +43,7 @@ const CheckoutPage = () => {
   let card  = React.useRef<StripeCardElement | null>(null);
   let clientSecret = React.useRef(null);
 
-
-  const [ addressDetails, setAddressDetails ] = React.useState({})
+  const [ addressDetails, setAddressDetails ] = React.useState<Address>({})
   const [ isLoadingAddress, setIsLoadingAddress ] = React.useState<boolean>(false)
   const product = {
     id : 1,
@@ -92,10 +106,115 @@ const CheckoutPage = () => {
     eDonLoad(false)
   }
 
+  const pay = async (e : FormEvent<HTMLFormElement>) => {
+    console.log(quantity)
+    e.preventDefault();
+    if (Object.entries(addressDetails).length === 0){
+      showError("Please add shipping address")
+      return;
+    }
+
+    if (clientSecret.current && card.current) {
+      let result =  await stripe.current?.confirmCardPayment(clientSecret.current, {
+        payment_method : {
+          card : card.current
+        }
+      })
+
+      if (result?.error && result?.error?.message) {
+        showError(result.error.message)
+      } else{
+        eDonLoad(true);
+        try {
+          const res = await fetch(`api/orders/create`, {
+            method : "POST",
+            body : JSON.stringify({
+              stripe_id : result?.paymentIntent?.id,
+              name : addressDetails.name,
+              address : addressDetails.address,
+              zipcode : addressDetails.zipcode,
+              city : addressDetails.city,
+              country : addressDetails.country,
+              products : cart,
+              total : quantity
+            })
+          })
+          if (res.status === 200) {
+            toast.success("Order Complete", {
+              autoClose : 3000
+            })
+            dispatch(clearCart())
+            return router.push("/success")
+          }
+        } catch(error) {
+          console.log(error)
+          toast.error("Something went wrong", {
+            autoClose : 300
+          })
+        }
+        eDonLoad(false)
+      }
+    }
+  }
+
+  const showError = (text:string) => {
+    let errorMsg = document.querySelector("#card-error");
+    toast.error(text, {
+      autoClose : 3000
+    })
+    if (errorMsg) {
+      errorMsg.textContent = text
+
+      setTimeout(() => {
+        errorMsg.textContent = ""
+      }, 3000)
+    }
+  }
+
+  const getAddress = async () => {
+    console.log(user)
+    if (user?.id == null || user?.id == undefined) {
+      setIsLoadingAddress(false)
+      return;
+    }
+    const response = await userAddress(user.id);
+    console.log(response)
+    if (response) {
+      setAddressDetails(response)
+      setIsLoadingAddress(false)
+    }
+    setIsLoadingAddress(false)
+  }
+
+  const getTotal = React.useCallback(
+    async () => {
+      console.log(total);
+      if (total < 0) {
+        toast.error("No Cart", {
+          autoClose : 3000
+        })
+        router.push("/")
+      }
+    }, [total, router])
+
   React.useEffect(()=>{
+    dispatch(cartCount());
+    getTotal()
+  }, [dispatch, getTotal])
+
+
+  React.useEffect(()=> {
+    dispatch(cartQuantity())
+  }, [dispatch])
+
+  React.useEffect(()=> {
+    getAddress()
+  }, [user])
+
+  React.useEffect(()=>{
+    setIsLoadingAddress(true)
     eDonLoad(true)
     dispatch(getCart())
-    console.log(total);
     setTimeout(() => {
       stripeInit()
     }, 300);
@@ -113,13 +232,34 @@ const CheckoutPage = () => {
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="text-xl font-semibold mb-2">Shipping Address</div>
                   <div>
-                    <ul className="text-sm mt-2">
-                      <li>Name : test</li>
-                      <li>Address : test</li>
-                      <li>Zipcode : test</li>
-                      <li>City : test</li>
-                      <li>Country : test</li>
-                    </ul>
+                    {
+                      !isLoadingAddress && (
+                        <Link href="/address" className="text-blue-500 text-sm underline ">
+                          {
+                            addressDetails.name ? "Update Address" : "Add Address"
+                          }
+                        </Link>
+                      )
+                    }
+                    {
+                      !isLoadingAddress && addressDetails.name && (
+                        <ul className="text-sm mt-2">
+                          <li>Name : {addressDetails.name}</li>
+                          <li>Address : {addressDetails.address}</li>
+                          <li>Zipcode : {addressDetails.zipcode}</li>
+                          <li>City : {addressDetails.city}</li>
+                          <li>Country : {addressDetails.country}</li>
+                        </ul>
+                      )
+                    }
+                    {
+                      isLoadingAddress && (
+                        <div className="flex items-center mt-1 gap-2">
+                          <AiOutlineLoading3Quarters className='animate-spin'/>
+                          Getting Address
+                        </div>
+                      )
+                    }
                   </div>
                 </div>
                 <div className="bg-white rounded-lg mt-4">
@@ -135,7 +275,7 @@ const CheckoutPage = () => {
                 <div className="p-4">
                   <div className="flex items-baseline justify-between text-sm mb-1">
                     <div>Items ({total})</div>
-                    <div>$12.99</div>
+                    <div>${(quantity/100).toFixed(2)}</div>
                   </div>
                   <div className="flex items-baseline justify-between text-sm mb-4">
                     <div>Shipping</div>
@@ -145,11 +285,13 @@ const CheckoutPage = () => {
                   <div className="flex items-center justify-between my-4">
                     <div className="font-semibold">Order total</div>
                     <div className="text-2xl font-semibold">
-                      $12.99
+                      ${(quantity/100).toFixed(2)}
                     </div>
                   </div>
 
-                  <form>
+                  <form
+                  onSubmit={pay}
+                  >
                     <div className="border border-gray-500 p-2 rounded-sm" id='card-element'/>
                       <p role='alert' className="text-red-700 font-semibold relative top-2" id='card-error'/>
                       <button className="mt-4 bg-blue-600 text-lg text-white font-semibold p-3 rounded-full">

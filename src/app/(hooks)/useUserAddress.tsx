@@ -1,7 +1,8 @@
 const useUserAddress = () => {
   let address = {}
-  const userAddress = async () => {
-    let response = await fetch(`/api/address/${'39aa2b8a-ba5c-4610-be97-510e7481826'}`)
+  const userAddress = async (id:string) => {
+    console.log(id)
+    let response = await fetch(`/api/address/${id}`)
     if (response) {
       let data = await response.json()
       console.log(data.res)
